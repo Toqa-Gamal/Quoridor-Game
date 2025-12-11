@@ -4,54 +4,70 @@ from PyQt5.QtWidgets import *
 from Core.board import Board
 
 class BoardView(QWidget):
-    GRID_SIZE = 9  
+    GRID_SIZE = 9
 
     def __init__(self, mode):
         super().__init__()
         self.mode = mode
         self.setWindowTitle("Quoridor - Game Board")
-        self.setGeometry(600, 200, 900, 850)
+        self.setGeometry(600, 200, 950, 900)
 
         self.cells = {}
         self.board_created = Board(self.mode == 'AI')
         self.initUI()
 
     def initUI(self):
+   
         main_layout = QHBoxLayout()
         board_container = QVBoxLayout()
 
+        # Background gradient
+        self.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(
+                    spread:pad, x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #F3E5F5, stop:1 #D1C4E9
+                );
+            }
+        """)
+
+     
         title = QLabel(f"Quoridor - {self.mode} Mode")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("""
-            font-size: 30px;
+            font-size: 34px;
             font-weight: bold;
             color: #4A148C;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: rgba(255,255,255,0.7);
             margin-bottom: 20px;
         """)
         board_container.addWidget(title)
 
-        # GRID
         grid_widget = QWidget()
         grid_layout = QGridLayout()
-        grid_layout.setSpacing(10)
+        grid_layout.setSpacing(12)
 
-        cell_style = """
+        tile_style = """
             QPushButton {
-                background-color: #EDE7F6;
-                border: 2px solid #B39DDB;
-                border-radius: 8px;
-                min-width: 55px;
-                min-height: 55px;
+                background-color: #F8F5FF;
+                border: 2px solid #C7B7E5;
+                border-radius: 10px;
+                min-width: 60px;
+                min-height: 60px;
+                box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
             }
             QPushButton:hover {
-                background-color: #D1C4E9;
+                background-color: #E5DAFF;
+                border: 2px solid #9C7EDB;
             }
         """
 
         for r in range(self.GRID_SIZE):
             for c in range(self.GRID_SIZE):
                 btn = QPushButton("")
-                btn.setStyleSheet(cell_style)
+                btn.setStyleSheet(tile_style)
                 btn.setProperty("row", r)
                 btn.setProperty("col", c)
                 btn.clicked.connect(self.handleCellClick)
@@ -62,68 +78,74 @@ class BoardView(QWidget):
         grid_widget.setLayout(grid_layout)
         board_container.addWidget(grid_widget)
 
-    
-        p1_row, p1_col = self.board_created.pawns["P1"]
-        p2_row, p2_col = self.board_created.pawns["P2"]
+       
+        p1_r, p1_c = self.board_created.pawns["P1"]
+        p2_r, p2_c = self.board_created.pawns["P2"]
 
-        self.placePawn(p1_row, p1_col, "#4A148C")   
-        self.placePawn(p2_row, p2_col, "#8254C2")   
+        self.placePawn(p1_r, p1_c, "#4A148C")
+        self.placePawn(p2_r, p2_c, "#7E57C2")
 
-   
+
         side_panel = QVBoxLayout()
         side_panel.setAlignment(Qt.AlignTop)
 
         self.label_turn = QLabel(f"Current Turn: {self.board_created.current_player}")
-        self.label_turn.setStyleSheet("font-size: 22px; font-weight: bold; color: #4A148C;")
+        self.label_turn.setStyleSheet("""
+            font-size: 24px;
+            font-weight: bold;
+            color: #4A148C;
+            padding: 10px;
+            background-color: rgba(255,255,255, 0.8);
+            border-radius: 14px;
+        """)
         side_panel.addWidget(self.label_turn)
 
+        # Buttons
+        button_style = """
+            QPushButton {
+                background-color: #7E57C2;
+                color: white;
+                padding: 14px;
+                border-radius: 16px;
+                font-size: 19px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #6A45AF;
+            }
+        """
+
         reset_btn = QPushButton("Restart Game")
-        reset_btn.setStyleSheet("""
-            background-color: #7E57C2;
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 18px;
-        """)
+        reset_btn.setStyleSheet(button_style)
         reset_btn.clicked.connect(self.resetGame)
 
         back_btn = QPushButton("Back to Menu")
-        back_btn.setStyleSheet("""
-            background-color: #9575CD;
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 18px;
-        """)
+        back_btn.setStyleSheet(button_style)
 
         side_panel.addSpacing(40)
         side_panel.addWidget(reset_btn)
         side_panel.addWidget(back_btn)
 
-        main_layout.addLayout(board_container, stretch=4)
-        main_layout.addLayout(side_panel, stretch=1)
-        self.setLayout(main_layout)
+        main_layout.addLayout(board_container, stretch=5)
+        main_layout.addLayout(side_panel, stretch=2)
 
+        self.setLayout(main_layout)
 
     def handleCellClick(self):
         btn = self.sender()
         r = btn.property("row")
         c = btn.property("col")
-        print(f"Clicked cell: ({r}, {c})")
 
         current_player = self.board_created.current_player
-
-        pawn_color = "#4A148C" if current_player == "P1" else "#8254C2"
         old_r, old_c = self.board_created.pawns[current_player]
+        color = "#4A148C" if current_player == "P1" else "#7E57C2"
+
         moved = self.board_created.move_pawn(current_player, (r, c))
 
         if moved:
             self.clearCell(old_r, old_c)
-            self.placePawn(r, c, pawn_color)
-
-            print("Pawn moved successfully.")
+            self.placePawn(r, c, color)
             self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
-
         else:
             print("Invalid move!")
 
@@ -131,31 +153,38 @@ class BoardView(QWidget):
         btn = self.cells[(row, col)]
         btn.setStyleSheet("""
             QPushButton {
-                background-color: #EDE7F6;
-                border: 2px solid #B39DDB;
-                border-radius: 8px;
-                min-width: 55px;
-                min-height: 55px;
+                background-color: #F8F5FF;
+                border: 2px solid #C7B7E5;
+                border-radius: 10px;
+                min-width: 60px;
+                min-height: 60px;
             }
         """)
 
-
-    def placePawn(self, row, col, color="#4A148C"):
+    def placePawn(self, row, col, color):
         btn = self.cells[(row, col)]
         btn.setStyleSheet(f"""
             QPushButton {{
                 background-color: {color};
-                border-radius: 27px;
-                border: 3px solid white;
-                min-width: 55px;
-                min-height: 55px;
+                border-radius: 30px;
+                border: 4px solid white;
+                min-width: 60px;
+                min-height: 60px;
+                box-shadow: 0px 0px 15px rgba(0,0,0,0.4);
             }}
         """)
 
     def resetGame(self):
-        print("Game reset triggered")
+        for r in range(self.GRID_SIZE):
+            for c in range(self.GRID_SIZE):
+                self.clearCell(r, c)
 
-        for (r, c), btn in self.cells.items():
-            self.clearCell(r, c)
+        self.board_created = Board(self.mode == 'AI')
 
-        self.label_turn.setText("Current Turn: Player 1")
+        p1_r, p1_c = self.board_created.pawns["P1"]
+        p2_r, p2_c = self.board_created.pawns["P2"]
+
+        self.placePawn(p1_r, p1_c, "#4A148C")
+        self.placePawn(p2_r, p2_c, "#7E57C2")
+
+        self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
