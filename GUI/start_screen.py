@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
                 background-color: #FFF8EE;
                 border-radius: 25px;
                 padding: 40px;
-                border: 4px solid #8B5A2B;   /* Dark Wood */
+                border: 4px solid #8B5A2B;   
             }
         """)
 
