@@ -1,6 +1,5 @@
 from Core.pathfinding import find_path
 
-
 class Board:
     GRID_SIZE = 9
     MAX_WALLS = 10
