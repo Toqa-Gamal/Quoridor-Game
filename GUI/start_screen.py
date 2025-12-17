@@ -4,7 +4,6 @@ from PyQt5.QtGui import *
 import sys
 from GUI.board_screen import BoardView
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
