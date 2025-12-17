@@ -1,4 +1,5 @@
 class Wall:
+
     @staticmethod
     def wall_edges(x, y, orientation, grid_size):
         """
