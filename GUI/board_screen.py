@@ -427,7 +427,7 @@ class BoardView(QWidget):
                 self.move(event.globalPos() - self.drag_position)
                 event.accept()
 
-    # ================= Game Logic =================
+   
 
     def handleCellClick(self):
         """
@@ -674,7 +674,7 @@ class BoardView(QWidget):
         self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
         self.updateWallsLabel()
 
-    # ================= Mode Selection =================
+   
 
     def setMoveMode(self):
         """
@@ -795,7 +795,7 @@ class BoardView(QWidget):
         # Simple message box
         msg = QMessageBox(self)
         msg.setWindowTitle("Game Over!")
-        msg.setText(f"🎉 {player_name} WINS! 🎉")
+        msg.setText(f" {player_name} WINS! ")
         msg.setInformativeText("Congratulations!")
         msg.setIcon(QMessageBox.Information)
 
@@ -842,6 +842,6 @@ class BoardView(QWidget):
         """
         Go back to main menu
         """
-        self.backToMenu.emit()  # Send signal
+        self.backToMenu.emit() 
         self.close()  # Close board window
 
