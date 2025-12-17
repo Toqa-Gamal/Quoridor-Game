@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from Core.board import Board
 
+
 class BoardView(QWidget):
     # Signal to go back to main menu
     backToMenu = pyqtSignal()
