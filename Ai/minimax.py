@@ -1,6 +1,7 @@
 from Ai.heuristics import heuristic
-
-
+#=====================================================
+# Minimax algorithm
+#======================================================
 def is_game_over(board):
     """
     Check if the game is over.
