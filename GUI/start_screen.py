@@ -230,11 +230,11 @@ class MainWindow(QMainWindow):
 
         frame.setLayout(layout)
 
-        # إضافة الإطار إلى المحتوى
+    
         content_layout.addWidget(frame)
         content_widget.setLayout(content_layout)
 
-        # إضافة المحتوى إلى التخطيط الرئيسي
+        
         main_layout.addWidget(content_widget)
         main_widget.setLayout(main_layout)
 
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
         shadow.setColor(QColor(136, 14, 79, 140))
         widget.setGraphicsEffect(shadow)
 
-    # ===== دعم السحب للنافذة =====
+
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.drag_position = event.globalPos() - self.frameGeometry().topLeft()

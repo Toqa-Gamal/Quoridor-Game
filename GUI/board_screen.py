@@ -5,7 +5,7 @@ from Core.board import Board
 
 
 class BoardView(QWidget):
-    # Signal to go back to main menu
+    
     backToMenu = pyqtSignal()
 
     GRID_SIZE = 9
@@ -41,7 +41,7 @@ class BoardView(QWidget):
         # ===== Create Title Bar =====
         self.createTitleBar()
 
-        # ===== Main Layout =====
+     
         main_layout_wrapper = QVBoxLayout()
         main_layout_wrapper.setContentsMargins(0, 0, 0, 0)
         main_layout_wrapper.setSpacing(0)
@@ -362,7 +362,6 @@ class BoardView(QWidget):
         close_btn.setFixedSize(28, 28)
         close_btn.clicked.connect(self.close)
 
-        # Add to layout
         title_layout.addWidget(icon_label)
         title_layout.addWidget(title_label)
         title_layout.addStretch()
@@ -439,7 +438,7 @@ class BoardView(QWidget):
 
         current_player = self.board_created.current_player
 
-        # ===== MOVE MODE =====
+      
         if self.action_mode == "move":
             old_r, old_c = self.board_created.pawns[current_player]
             color = "#AD1457" if current_player == "P1" else "#F48FB1"
@@ -486,7 +485,7 @@ class BoardView(QWidget):
         """
         Draw beautiful wall with player colors - CORRECT PLAYER
         """
-        # Use the player parameter directly (no need to reverse)
+     
         wall_player = player
 
         # Colors for each player
@@ -832,7 +831,7 @@ class BoardView(QWidget):
 
         msg.exec_()
 
-        # Handle button click
+     
         if msg.clickedButton() == play_again:
             self.resetGame()
         elif msg.clickedButton() == main_menu:
@@ -843,5 +842,5 @@ class BoardView(QWidget):
         Go back to main menu
         """
         self.backToMenu.emit() 
-        self.close()  # Close board window
+        self.close() 
 
