@@ -98,7 +98,7 @@ All screenshots are stored in the **`assets/`** folder.
 Install dependencies:
 ```bash
 pip install PyQt5
-
+```
 ---
 ## 🚀 Running the Game
 ```bash
