@@ -67,19 +67,33 @@ Players can move pawns, place walls strategically, and challenge a computer oppo
 
 ## 🖼️ Game Screenshots
 
+<details>
+<summary><b>👉 Click to view game screens</b></summary>
+
+<br>
+
 ### 🏠 Main Screen
 ![Main Screen](assets/main_screen.png)
+
+---
 
 ### 👥 Human vs Human Mode
 ![Human Mode](assets/human_mode.png)
 
+---
+
 ### 🤖 Human vs AI Mode
 ![AI Mode](assets/ai_mode.png)
+
+---
 
 ### ⚙️ AI Difficulty Selection
 ![AI Difficulty](assets/ai_difficulty.png)
 
+</details>
+
 ---
+
 
 ## 🛠️ Installation
 
