@@ -245,6 +245,32 @@ class MainWindow(QMainWindow):
         # After you define `layout` that contains title, subtitle, and buttons:
         self.main_content_layout = layout  # ADD THIS LINE
 
+    def applyMainButtonStyle(self, btn):
+        button_style = """
+        QPushButton {
+            background: qlineargradient(
+                x1:0, y1:0, x2:0, y2:1,
+                stop:0 #F48FB1,
+                stop:1 #E91E63
+            );
+            color: #FFFFFF;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 22px;
+            min-width: 100px;
+            border: 3px solid #AD1457;
+        }
+        QPushButton:hover {
+            background: #EC407A;
+        }
+        QPushButton:pressed {
+            background: #C2185B;
+        }
+        """
+        btn.setStyleSheet(button_style)
+        self.addShadow(btn, blur=25, x=10, y=8)
+
     # ===== Utilities =====
     def addShadow(self, widget, blur=20, x=0, y=6):
         shadow = QGraphicsDropShadowEffect(self)
@@ -269,47 +295,41 @@ class MainWindow(QMainWindow):
         # Clear current main content
         for i in reversed(range(self.main_content_layout.count())):
             widget = self.main_content_layout.itemAt(i).widget()
-            if widget is not None:
+            if widget:
                 widget.setParent(None)
 
-        # New Title
+        # ===== Back Button (same logic as 3rd screen) =====
+        back_btn = QPushButton("← Back to Menu")
+        back_btn.setFixedWidth(240)
+        self.applyMainButtonStyle(back_btn)
+        back_btn.clicked.connect(self.initUI)
+
+        # ===== Title =====
         title = QLabel("Choose AI Difficulty")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 38px; font-weight: bold; color: #C2185B;")
-        self.main_content_layout.addWidget(title)
+        title.setStyleSheet("""
+            font-size: 38px;
+            font-weight: bold;
+            color: #C2185B;
+        """)
 
-        # Buttons
+        # ===== Difficulty Buttons =====
         self.easy_btn = QPushButton("EASY")
         self.medium_btn = QPushButton("MEDIUM")
         self.hard_btn = QPushButton("HARD")
 
-        button_style = """
-        QPushButton {
-            background-color: #C2185B;
-            color: white;
-            padding: 20px 40px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 22px;
-            border: 3px solid #880E4F;
-        }
-        QPushButton:hover { background-color: #EC407A; }
-        QPushButton:pressed { background-color: #880E4F; }
-        """
         for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.setStyleSheet(button_style)
+            self.applyMainButtonStyle(btn)
             btn.clicked.connect(lambda checked, b=btn: self.start_ai(b.text()))
 
-        # Wrap buttons in a frame
-        button_frame = QFrame()
-        button_frame.setStyleSheet("background-color: #FFE4F5; border-radius: 20px;")
-        button_layout = QHBoxLayout(button_frame)
-        button_layout.setSpacing(40)
-        button_layout.addWidget(self.easy_btn)
-        button_layout.addWidget(self.medium_btn)
-        button_layout.addWidget(self.hard_btn)
-
-        self.main_content_layout.addWidget(button_frame)
+        # ===== Layout =====
+        self.main_content_layout.addWidget(back_btn)
+        self.main_content_layout.addSpacing(20)
+        self.main_content_layout.addWidget(title)
+        self.main_content_layout.addSpacing(30)
+        self.main_content_layout.addWidget(self.easy_btn)
+        self.main_content_layout.addWidget(self.medium_btn)
+        self.main_content_layout.addWidget(self.hard_btn)
 
     def start_ai(self, difficulty):
         from Ai.ai_player import AIPlayer
