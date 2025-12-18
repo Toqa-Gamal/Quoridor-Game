@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Quoridor Game")
-        self.setGeometry(700, 300, 950, 820)
+        self.setGeometry(500, 100, 950, 820)
 
         self.setWindowFlags(Qt.FramelessWindowHint)
 

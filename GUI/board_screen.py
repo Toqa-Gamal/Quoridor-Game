@@ -29,7 +29,7 @@ class BoardView(QWidget):
 
 
         self.setWindowTitle("Quoridor - Game Board")
-        self.setGeometry(600, 200, 980, 900)
+        self.setGeometry(500, 100, 980, 900)
 
         self.cells = {}
         self.wall_labels = []
