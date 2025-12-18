@@ -88,7 +88,7 @@ Players can move pawns, place walls strategically, and challenge a computer oppo
 ---
 
 ### ⚙️ AI Difficulty Selection
-![AI Difficulty](assets/ai_difficulty.png)
+![AI Difficulty](assets/ai_diff.png)
 
 </details>
 
