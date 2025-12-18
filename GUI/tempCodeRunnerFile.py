@@ -269,7 +269,7 @@ class MainWindow(QMainWindow):
         }
         """
         btn.setStyleSheet(button_style)
-        self.addShadow(btn, blur=25, x=10, y=8)
+        self.addShadow(btn, blur=10, x=10, y=8)
 
     # ===== Utilities =====
     def addShadow(self, widget, blur=20, x=0, y=6):
@@ -301,7 +301,10 @@ class MainWindow(QMainWindow):
         # ===== Back Button (same logic as 3rd screen) =====
         back_btn = QPushButton("← Back to Menu")
         back_btn.setFixedWidth(240)
+
+
         self.applyMainButtonStyle(back_btn)
+
         back_btn.clicked.connect(self.initUI)
 
         # ===== Title =====
