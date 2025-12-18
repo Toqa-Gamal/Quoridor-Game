@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 import sys
 from GUI.board_screen import BoardView
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -241,6 +242,8 @@ class MainWindow(QMainWindow):
         main_widget.setLayout(main_layout)
 
         self.setCentralWidget(main_widget)
+        # After you define `layout` that contains title, subtitle, and buttons:
+        self.main_content_layout = layout  # ADD THIS LINE
 
     # ===== Utilities =====
     def addShadow(self, widget, blur=20, x=0, y=6):
@@ -263,17 +266,58 @@ class MainWindow(QMainWindow):
 
     # ===== Navigation =====
     def open_ai_mode(self):
-        # Create a simple dialog to choose difficulty
-        difficulties = ["EASY", "MEDIUM", "HARD"]
-        difficulty, ok = QInputDialog.getItem(
-            self, "Select Difficulty", "Choose AI difficulty:", difficulties, 0, False
-        )
+        # Clear current main content
+        for i in reversed(range(self.main_content_layout.count())):
+            widget = self.main_content_layout.itemAt(i).widget()
+            if widget is not None:
+                widget.setParent(None)
 
-        if ok:  # Only proceed if user selects a difficulty
-            self.board = BoardView("AI", difficulty=difficulty)
-            self.board.backToMenu.connect(self.show)
-            self.board.show()
-            self.close()
+        # New Title
+        title = QLabel("Choose AI Difficulty")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 38px; font-weight: bold; color: #C2185B;")
+        self.main_content_layout.addWidget(title)
+
+        # Buttons
+        self.easy_btn = QPushButton("EASY")
+        self.medium_btn = QPushButton("MEDIUM")
+        self.hard_btn = QPushButton("HARD")
+
+        button_style = """
+        QPushButton {
+            background-color: #C2185B;
+            color: white;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 22px;
+            border: 3px solid #880E4F;
+        }
+        QPushButton:hover { background-color: #EC407A; }
+        QPushButton:pressed { background-color: #880E4F; }
+        """
+        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
+            btn.setStyleSheet(button_style)
+            btn.clicked.connect(lambda checked, b=btn: self.start_ai(b.text()))
+
+        # Wrap buttons in a frame
+        button_frame = QFrame()
+        button_frame.setStyleSheet("background-color: #FFE4F5; border-radius: 20px;")
+        button_layout = QHBoxLayout(button_frame)
+        button_layout.setSpacing(40)
+        button_layout.addWidget(self.easy_btn)
+        button_layout.addWidget(self.medium_btn)
+        button_layout.addWidget(self.hard_btn)
+
+        self.main_content_layout.addWidget(button_frame)
+
+    def start_ai(self, difficulty):
+        from Ai.ai_player import AIPlayer
+        self.ai_player_obj = AIPlayer("P2", difficulty)
+        self.board = BoardView("AI", difficulty=difficulty)
+        self.board.backToMenu.connect(self.show)
+        self.board.show()
+        self.close()
 
     def open_human_mode(self):
         self.board = BoardView("HUMAN")

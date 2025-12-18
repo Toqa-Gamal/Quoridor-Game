@@ -12,42 +12,60 @@ class DifficultyPage(QWidget):
         self.setWindowTitle("Select Difficulty")
         self.setFixedSize(400, 200)
 
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)
-        layout.setSpacing(20)
+        # ===== Main layout =====
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignCenter)
+        main_layout.setSpacing(20)
 
+        # ===== Title label =====
         label = QLabel("Choose AI Difficulty")
         label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("font-size: 24px; font-weight: bold; color: #C2185B;")
-        layout.addWidget(label)
+        label.setStyleSheet("""
+            font-size: 24px;
+            font-weight: bold;
+            color: #C2185B;
+        """)
+        main_layout.addWidget(label)
 
+        # ===== Buttons =====
         self.easy_btn = QPushButton("EASY")
         self.medium_btn = QPushButton("MEDIUM")
         self.hard_btn = QPushButton("HARD")
 
+        button_style = """
+        QPushButton {
+            background-color: #C2185B !important;
+            color: white !important;
+            padding: 14px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 18px;
+            border: 3px solid #880E4F !important;
+        }
+        QPushButton:hover {
+            background-color: #EC407A !important;
+        }
+        QPushButton:pressed {
+            background-color: #880E4F !important;
+        }
+        """
+
         for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #C2185B;
-                    color: white;
-                    padding: 14px 30px;
-                    font-size: 20px;
-                    font-weight: bold;
-                    border-radius: 18px;
-                    border: 3px solid #880E4F;
-                }
-                QPushButton:hover { background-color: #EC407A; }
-                QPushButton:pressed { background-color: #880E4F; }
-            """)
+            btn.setStyleSheet(button_style)
             btn.clicked.connect(lambda checked, b=btn: self.chooseDifficulty(b.text()))
 
-        btn_layout = QHBoxLayout()
-        btn_layout.addWidget(self.easy_btn)
-        btn_layout.addWidget(self.medium_btn)
-        btn_layout.addWidget(self.hard_btn)
-        layout.addLayout(btn_layout)
+        # ===== Wrap buttons in a frame =====
+        button_frame = QFrame()
+        button_frame.setStyleSheet("background-color: #FFE4F5; border-radius: 20px;")
+        button_layout = QHBoxLayout(button_frame)
+        button_layout.setSpacing(20)
+        button_layout.addWidget(self.easy_btn)
+        button_layout.addWidget(self.medium_btn)
+        button_layout.addWidget(self.hard_btn)
 
-        self.setLayout(layout)
+        main_layout.addWidget(button_frame)
+
+        self.setLayout(main_layout)
 
     def chooseDifficulty(self, difficulty):
         self.difficultySelected.emit(difficulty)
@@ -70,7 +88,6 @@ class MainWindow(QMainWindow):
 
         self.initUI()
 
-        self.diff_page.difficultySelected.connect(self.start_ai)
         self.human_player.clicked.connect(self.open_human_mode)
 
 
@@ -296,7 +313,8 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(main_widget)
 
-
+        self.ai_player.clicked.connect(self.open_ai_mode)
+        self.human_player.clicked.connect(self.open_human_mode)
 
     # ===== Utilities =====
     def addShadow(self, widget, blur=20, x=0, y=6):
@@ -323,14 +341,11 @@ class MainWindow(QMainWindow):
         self.diff_page.difficultySelected.connect(self.start_ai)
         self.diff_page.show()
 
-
-
     def open_human_mode(self):
         self.board = BoardView("HUMAN")
         self.board.backToMenu.connect(self.show)
         self.board.show()
         self.close()
-
 
     def start_ai(self, difficulty):
         from Ai.ai_player import AIPlayer
@@ -339,5 +354,6 @@ class MainWindow(QMainWindow):
         self.board.backToMenu.connect(self.show)
         self.board.show()
         self.close()
+
 
 
