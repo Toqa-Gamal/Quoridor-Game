@@ -185,8 +185,9 @@ class MainWindow(QMainWindow):
         subtitle = QLabel("Choose Game Mode")
         subtitle.setAlignment(Qt.AlignCenter)
         subtitle.setStyleSheet("""
-        font-size: 22px;
+        font-size: 38px;
         color: #C2185B;
+        font-weight: bold;
         margin-bottom: 10px;
         """)
 

@@ -3,6 +3,55 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import sys
 from GUI.board_screen import BoardView
+class DifficultyPage(QWidget):
+    difficultySelected = pyqtSignal(str)  # Emit the chosen difficulty
+
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Select Difficulty")
+        self.setFixedSize(400, 200)
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+
+        label = QLabel("Choose AI Difficulty")
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("font-size: 24px; font-weight: bold; color: #C2185B;")
+        layout.addWidget(label)
+
+        self.easy_btn = QPushButton("EASY")
+        self.medium_btn = QPushButton("MEDIUM")
+        self.hard_btn = QPushButton("HARD")
+
+        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
+            btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #C2185B;
+                    color: white;
+                    padding: 14px 30px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    border-radius: 18px;
+                    border: 3px solid #880E4F;
+                }
+                QPushButton:hover { background-color: #EC407A; }
+                QPushButton:pressed { background-color: #880E4F; }
+            """)
+            btn.clicked.connect(lambda checked, b=btn: self.chooseDifficulty(b.text()))
+
+        btn_layout = QHBoxLayout()
+        btn_layout.addWidget(self.easy_btn)
+        btn_layout.addWidget(self.medium_btn)
+        btn_layout.addWidget(self.hard_btn)
+        layout.addLayout(btn_layout)
+
+        self.setLayout(layout)
+
+    def chooseDifficulty(self, difficulty):
+        self.difficultySelected.emit(difficulty)
+        self.close()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,55 +65,17 @@ class MainWindow(QMainWindow):
 
         self.ai_player = QPushButton("Play vs AI")
         self.human_player = QPushButton("Play vs Human")
-        self.easy_btn = QPushButton("EASY")
-        self.medium_btn = QPushButton("MEDIUM")
-        self.hard_btn = QPushButton("HARD")
-        self.difficulty_group = QButtonGroup(self)
-        self.difficulty_group.setExclusive(True)  # only one button can be selected at a time
-        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            self.difficulty_group.addButton(btn)
 
-        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.setCheckable(True)
-            for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-                btn.setStyleSheet("""
-                    QPushButton {
-                        background: qlineargradient(
-                            x1:0, y1:0, x2:0, y2:1,
-                            stop:0 #F48FB1,
-                            stop:1 #E91E63
-                        );
-                        color: white;
-                        padding: 14px 30px;
-                        font-size: 20px;
-                        font-weight: bold;
-                        border-radius: 18px;
-                        border: 3px solid #AD1457;
-                    }
-                    QPushButton:hover {
-                        background: #EC407A;
-                    }
-                    QPushButton:pressed {
-                        background: #C2185B;
-                    }
-                    QPushButton:checked {
-                        background: #880E4F;    /* selected color */
-                        border: 3px solid #FFC107;
-                    }
-                """)
-
-            self.addShadow(btn, blur=20, x=0, y=6)
-            btn.hide()  # hide initially
-
-        # Connect buttons
-        self.easy_btn.clicked.connect(lambda: self.start_ai("easy"))
-        self.medium_btn.clicked.connect(lambda: self.start_ai("medium"))
-        self.hard_btn.clicked.connect(lambda: self.start_ai("hard"))
+        # Create button group
 
         self.initUI()
 
-        self.ai_player.clicked.connect(self.show_difficulty_options)
+        self.diff_page.difficultySelected.connect(self.start_ai)
         self.human_player.clicked.connect(self.open_human_mode)
+
+
+
+
 
     def createControlButtons(self):
 
@@ -216,38 +227,6 @@ class MainWindow(QMainWindow):
 
 
 
-
-        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.setStyleSheet("""
-                QPushButton {
-                    background: qlineargradient(
-                        x1:0, y1:0, x2:0, y2:1,
-                        stop:0 #F48FB1,
-                        stop:1 #E91E63
-                    );
-                    color: white;
-                    padding: 12px 24px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    border-radius: 18px;
-                    border: 2px solid #AD1457;
-                }
-                QPushButton:hover {
-                    background: #EC407A;
-                }
-                QPushButton:pressed {
-                    background: #C2185B;
-                }
-            """)
-            self.addShadow(btn, blur=20, x=0, y=6)
-
-
-        # Initially hide difficulty buttons until AI is clicked
-        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.hide()
-
-        layout.addLayout(self.difficulty_layout)
-
         # ===== Title =====
         title = QLabel("QUORIDOR")
         title.setAlignment(Qt.AlignCenter)
@@ -340,8 +319,11 @@ class MainWindow(QMainWindow):
 
     # ===== Navigation =====
     def open_ai_mode(self):
-        # We no longer use combo_diff here
-        self.show_difficulty_options()
+        self.diff_page = DifficultyPage()
+        self.diff_page.difficultySelected.connect(self.start_ai)
+        self.diff_page.show()
+
+
 
     def open_human_mode(self):
         self.board = BoardView("HUMAN")
@@ -349,11 +331,6 @@ class MainWindow(QMainWindow):
         self.board.show()
         self.close()
 
-    def show_difficulty_options(self):
-        self.ai_player.hide()
-        self.human_player.hide()
-        for btn in [self.easy_btn, self.medium_btn, self.hard_btn]:
-            btn.show()
 
     def start_ai(self, difficulty):
         from Ai.ai_player import AIPlayer

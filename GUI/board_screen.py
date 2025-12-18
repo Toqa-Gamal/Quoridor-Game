@@ -5,6 +5,8 @@ from Core.board import Board
 
 import sys
 import os
+from copy import deepcopy
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from Ai.ai_player import AIPlayer
@@ -32,6 +34,8 @@ class BoardView(QWidget):
         self.cells = {}
         self.wall_labels = []
         self.board_created = Board(self.mode == 'AI')
+        self.undo_stack = []
+        self.redo_stack = []
 
         # Make window frameless
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -45,6 +49,15 @@ class BoardView(QWidget):
         if self.mode == "AI":
             from Ai.ai_player import AIPlayer
             self.ai_player_obj = AIPlayer("P2", self.difficulty)
+
+    def saveState(self):
+        self.undo_stack.append({
+            "pawns": deepcopy(self.board_created.pawns),
+            "walls": deepcopy(self.board_created.walls),
+            "walls_left": deepcopy(self.board_created.walls_left),
+            "current_player": self.board_created.current_player
+        })
+        self.redo_stack.clear()
 
     def initUI(self):
         """
@@ -303,6 +316,17 @@ class BoardView(QWidget):
 
         side_panel.addWidget(reset_btn)
         side_panel.addWidget(back_btn)
+        undo_btn = QPushButton("Undo")
+        redo_btn = QPushButton("Redo")
+
+        undo_btn.setStyleSheet(button_style)
+        redo_btn.setStyleSheet(button_style)
+
+        undo_btn.clicked.connect(self.undo)
+        redo_btn.clicked.connect(self.redo)
+
+        side_panel.addWidget(undo_btn)
+        side_panel.addWidget(redo_btn)
 
         # Assemble Main Layout
         main_layout.addLayout(board_container, stretch=5)
@@ -458,9 +482,11 @@ class BoardView(QWidget):
         if self.action_mode == "move":
             old_r, old_c = self.board_created.pawns[current_player]
             color = "#AD1457" if current_player == "P1" else "#F48FB1"
-
+            self.saveState()
             moved = self.board_created.move_pawn(current_player, (r, c))
             if moved:
+
+
                 # Update board UI
                 self.clearCell(old_r, old_c)
                 self.placePawn(r, c, color)
@@ -485,15 +511,17 @@ class BoardView(QWidget):
         # ===== WALL MODE =====
         elif self.action_mode == "wall":
             placing_player = current_player
-
+            self.saveState()
             placed = self.board_created.place_wall(
                 current_player,
                 r,
                 c,
                 self.wall_orientation
             )
-
             if placed:
+
+
+
                 print(f"{placing_player} placed wall at ({r}, {c}) - {self.wall_orientation}")
                 self.drawWall(r, c, self.wall_orientation, placing_player)
                 self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
@@ -675,6 +703,9 @@ class BoardView(QWidget):
         """
         Restart game
         """
+        self.undo_stack.clear()
+        self.redo_stack.clear()
+
         # Clear all cells
         for r in range(self.GRID_SIZE):
             for c in range(self.GRID_SIZE):
@@ -886,10 +917,13 @@ class BoardView(QWidget):
         self.executeAction(action)
 
     def executeAction(self, action):
+
+
         current_player = self.board_created.current_player
         color = "#F48FB1"  # AI color (P2)
 
         if action["type"] == "move":
+            self.saveState()
             old_r, old_c = self.board_created.pawns[current_player]
             moved = self.board_created.move_pawn(current_player, action["to"])
             if moved:
@@ -903,6 +937,7 @@ class BoardView(QWidget):
                     self.showSimpleWinner(winner)
 
         elif action["type"] == "wall":
+            self.saveState()
             placed = self.board_created.place_wall(
                 current_player, action["x"], action["y"], action["orientation"]
             )
@@ -910,3 +945,66 @@ class BoardView(QWidget):
                 self.drawWall(action["x"], action["y"], action["orientation"], current_player)
                 self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
                 self.updateWallsLabel()
+
+    def restoreState(self, state):
+        self.board_created.pawns = deepcopy(state["pawns"])
+        self.board_created.walls = deepcopy(state["walls"])
+        self.board_created.walls_left = deepcopy(state["walls_left"])
+        self.board_created.current_player = state["current_player"]
+
+        # Clear board
+        for r in range(self.GRID_SIZE):
+            for c in range(self.GRID_SIZE):
+                self.clearCell(r, c)
+
+        # Clear walls
+        # ---- SAFE WALL CLEANUP ----
+        for wall in list(self.wall_labels):
+            if wall is not None:
+                wall.hide()
+                wall.setParent(None)
+                wall.deleteLater()
+
+        self.wall_labels = []
+        # ---- REDRAW WALLS ----
+        for wall_data in self.board_created.walls:
+            x, y, orient, player = wall_data
+            self.drawWall(x, y, orient, player)
+
+        # Place pawns
+        for player, (r, c) in self.board_created.pawns.items():
+            color = "#AD1457" if player == "P1" else "#F48FB1"
+            self.placePawn(r, c, color)
+
+
+
+        self.label_turn.setText(f"Current Turn: {self.board_created.current_player}")
+        self.updateWallsLabel()
+
+    def undo(self):
+        if not self.undo_stack:
+            return
+
+        self.redo_stack.append({
+            "pawns": deepcopy(self.board_created.pawns),
+            "walls": deepcopy(self.board_created.walls),
+            "walls_left": deepcopy(self.board_created.walls_left),
+            "current_player": self.board_created.current_player
+        })
+
+        state = self.undo_stack.pop()
+        self.restoreState(state)
+
+    def redo(self):
+        if not self.redo_stack:
+            return
+
+        self.undo_stack.append({
+            "pawns": deepcopy(self.board_created.pawns),
+            "walls": deepcopy(self.board_created.walls),
+            "walls_left": deepcopy(self.board_created.walls_left),
+            "current_player": self.board_created.current_player
+        })
+
+        state = self.redo_stack.pop()
+        self.restoreState(state)
