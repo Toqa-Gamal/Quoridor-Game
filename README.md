@@ -63,6 +63,24 @@ Players can move pawns, place walls strategically, and challenge a computer oppo
 | Undo/Redo  | Ctrl+Z / Ctrl+Y (if implemented)    |
 | Reset Game | Click "Reset" button                 |
 ---
+---
+
+## 🖼️ Game Screenshots
+
+### 🏠 Main Screen
+![Main Screen](assets/main_screen.png)
+
+### 👥 Human vs Human Mode
+![Human Mode](assets/human_mode.png)
+
+### 🤖 Human vs AI Mode
+![AI Mode](assets/ai_mode.png)
+
+### ⚙️ AI Difficulty Selection
+![AI Difficulty](assets/ai_difficulty.png)
+
+---
+
 ## 🛠️ Installation
 
 ### Requirements
