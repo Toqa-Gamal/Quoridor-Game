@@ -106,4 +106,42 @@ git clone https://github.com/yourusername/quoridor-game.git
 cd quoridor-game
 python main.py
 ```
+---
+## 🎮 Controls Explanation
+
+The game is controlled through an intuitive graphical user interface using mouse and keyboard input.
+
+### 🧍 Pawn Movement
+- Click on your pawn to highlight all valid moves
+- Click on one of the highlighted squares to move the pawn
+- Illegal moves are automatically prevented
+
+### 🧱 Wall Placement
+- Enable **Wall Placement Mode** from the interface
+- Click on a valid board edge to place a wall
+- Wall placement is rejected if it violates game rules or blocks all paths
+
+### 🔄 Game Controls
+- **Reset Game**: Restarts the game from the initial state
+
+### 🎯 Turn Management
+- The interface displays:
+  - Current player’s turn
+  - Remaining wall count for each player
+  - Game status messages (invalid move, winner announcement)
+
+---
+
+## 🎥 Demo Video
+
+A short demonstration video showcasing the gameplay and features of the Quoridor game is available at the following link:
+
+🔗 **Demo Video:**  
+https://youtu.be/your-demo-video-link
+
+The demo video includes:
+- Game setup and UI overview  
+- Human vs Human gameplay  
+- Human vs AI gameplay  
+- AI difficulty selection  
 
