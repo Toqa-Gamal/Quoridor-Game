@@ -506,7 +506,7 @@ class BoardView(QWidget):
                 if self.mode == "AI" and self.board_created.current_player == "P2":
                     QTimer.singleShot(300, self.ai_move)
             else:
-                print(f"Invalid move!")
+                 self.showInvalidMove("Cannot move to this cell!")
 
         # ===== WALL MODE =====
         elif self.action_mode == "wall":
@@ -531,7 +531,7 @@ class BoardView(QWidget):
                 if self.mode == "AI" and self.board_created.current_player == "P2":
                     QTimer.singleShot(300, self.ai_move)
             else:
-                print(f"Cannot place wall at ({r}, {c})")
+                self.showInvalidMove("Cannot place wall here!")
         # After human move in "move" mode
 
 
@@ -1008,3 +1008,36 @@ class BoardView(QWidget):
 
         state = self.redo_stack.pop()
         self.restoreState(state)
+
+    def showInvalidMove(self, message="Invalid Move!"):
+        """
+        Show popup for invalid move or wall placement.
+        """
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Invalid Action")
+        msg.setText(message)
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        msg.setStyleSheet("""
+        QMessageBox {
+            background: #FFE4F5;
+        }
+        QLabel {
+            color: #880E4F;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        QPushButton {
+            background: #C2185B;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background: #EC407A;
+        }
+        """)
+        msg.exec_()
